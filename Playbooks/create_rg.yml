@@ -1,0 +1,18 @@
+- name: Create a resource group
+  azure_rm_resourcegroup:
+    name: team4rg
+    location: westus
+    tags:
+      testing: testing
+      delete: never
+
+- name: Delete a resource group
+  azure_rm_resourcegroup:
+    name: team4rg
+    state: absent
+
+- name: Delete a resource group including resources it contains
+  azure_rm_resourcegroup:
+    name: team4rg
+    force_delete_nonempty: true
+    state: absent
