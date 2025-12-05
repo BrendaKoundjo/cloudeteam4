@@ -1,0 +1,62 @@
+- name: Create Azure VM
+  hosts: localhost
+  tasks:
+  - name: Create resource group
+    azure_rm_resourcegroup:
+      name: team4rg
+      location: eastus
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      resource_group: team4rg
+      name: myVnet
+      address_prefixes: "10.0.0.0/16"
+  - name: Add subnet
+    azure_rm_subnet:
+      resource_group: team4rg
+      name: mySubnet
+      address_prefix: "10.0.1.0/24"
+      virtual_network: myVnet
+  - name: Create public IP address
+    azure_rm_publicipaddress:
+      resource_group: team4rg
+      allocation_method: Static
+      name: myPublicIP
+    register: output_ip_address
+  - name: Public IP of VM
+    debug:
+      msg: "The public IP is {{ output_ip_address.state.ip_address }}."
+  - name: Create Network Security Group that allows SSH
+    azure_rm_securitygroup:
+      resource_group: team4rg
+      name: myNetworkSecurityGroup
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+  - name: Create virtual network interface card
+    azure_rm_networkinterface:
+      resource_group: team4rg
+      name: myNIC
+      virtual_network: myVnet
+      subnet: mySubnet
+      public_ip_name: myPublicIP
+      security_group: myNetworkSecurityGroup
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: team4rg
+      name: myVM
+      vm_size: Standard_DS1_v2
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQChDXy/KXrlwxXgWvjQzmTDBYzwYYZasjdgkzwYsQMTJigAumymfru40ePZDxu19oKmF6yNGqx9cMFAp/xS8XUMLwf9TWPvoS2FIYGVnHg+Pe7OxpywnFf1A35k0tGZFDBXt6LHdM8iTswdFrWFkfqxaiObaxtrODOHUX8+Tth/DO/jbdH0XZB4UpjAsl3vgRuU+91QRVBR5qEmx6KB9S26++wTVUeGaCURM6FIRJiqrce2Pc7DKlli0KYhQ3Db4N6q1iLwEQ/OeoDawvPHoRFbOpJt4oG/Kc0PjaTXzEt6hR6lxQR5xiuzj61tx0Yx3kxSSG+rZr0YdHO8NkGvjWqUyDlVlMYWvtrjXlOsba51dDkvKOWK29Op9pkTWUG2KHT2kjQYtKFjKRkqH/yGek7Rk9r+nl51p/jQipOWHztCBB0i7FkYHilU52nNOd/M5UQf1OvZgaTzPDgV9IbJ2SnmTcj5gPI0RQEtAOq1rgt+be9xRWheSQ9iDMytqOedNmbEhR0nmebgdg6Qyrb/zmlIsQuZTP6Si9Nc1KGRTnSyLOdlgWnKeCsSRsh43LSU4WEgy71xwrkvqmXCX3K+CqZeUlDAmuFNBlrJzd/52ukgIKUNYbQYn0vweWjB92o3UYGETL7dUzqrkrVuqknUD2TAVMytXJOsk7/L5SUqGV7flw== koundjo@koundjo-HP-Pavilion-x360-Convertible"
+      network_interfaces: myNIC
+      image:
+        offer: 0001-com-ubuntu-server-jammy
+        publisher: Canonical
+        sku: 22_04-lts
+        version: latest
