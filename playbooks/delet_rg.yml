@@ -3,7 +3,7 @@
   collections:
     - azure.azcollection
   tasks:
-    - name: Create resource group team4rg    
+    - name: supprimer resource group team4rg    
       azure_rm_resourcegroup:
         name: team4rg
         state: absent
