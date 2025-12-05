@@ -1,18 +1,15 @@
-- name: Create a resource group
-  azure_rm_resourcegroup:
-    name: team4rg
-    location: westus
-    tags:
-      testing: testing
-      delete: never
+- hosts: localhost
+  connection: local
+  collections:
+    - azure.azcollection
 
-- name: Delete a resource group
-  azure_rm_resourcegroup:
-    name: team4rg
-    state: absent
+  tasks:
+    - name: Create resource group team4rg
+      azure_rm_resourcegroup:
+        name: team4rg
+        location: westus
+      register: rg_result
 
-- name: Delete a resource group including resources it contains
-  azure_rm_resourcegroup:
-    name: team4rg
-    force_delete_nonempty: true
-    state: absent
+    - name: Résumé création
+      debug:
+        msg: "Resource group team4rg créé ou déjà existant. changed={{ rg_result.changed }}"
