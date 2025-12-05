@@ -22,6 +22,8 @@
       resource_group: team4rg
       allocation_method: Static
       name: myPublicIP
+      location: francecentral
+
     register: output_ip_address
   - name: Public IP of VM
     debug:
