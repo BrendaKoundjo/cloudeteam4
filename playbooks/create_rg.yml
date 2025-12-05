@@ -1,5 +1,5 @@
-- hosts: localhost
-  connection: local
+- name: createrg
+  hosts: localhost
   collections:
     - azure.azcollection
 
@@ -12,4 +12,4 @@
 
     - name: Résumé création
       debug:
-        msg: "Resource group team4rg créé ou déjà existant. changed={{ rg_result.changed }}"
+        msg: "Resource group team4rg créé oudéjà existant. changed={{ rg_result.changed }}"
