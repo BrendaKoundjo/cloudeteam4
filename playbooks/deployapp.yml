@@ -75,7 +75,6 @@
     - name: Reset SSH connection to apply group membership
       ansible.builtin.meta: reset_connection
 
-
 ########################################
 # PLAY 2 – Run 2048 Docker container
 ########################################
