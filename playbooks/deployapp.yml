@@ -80,7 +80,7 @@
 # PLAY 2 – Run 2048 Docker container
 ########################################
 - name: Run 2048 game container
-  hosts: docker_hosts
+  hosts: all
   become: true
 
   vars:
