@@ -1,3 +1,7 @@
+---
+########################################
+# PLAY 1 – Install Docker & configure user
+########################################
 - name: Install Docker Engine (official repo) and configure permissions
   hosts: docker_hosts
   become: true
@@ -11,6 +15,7 @@
       - containerd.io
       - docker-buildx-plugin
       - docker-compose-plugin
+    docker_user: azureuser
 
   tasks:
     - name: Install prerequisites
@@ -27,13 +32,13 @@
         state: directory
         mode: "0755"
 
-    - name: Download Docker GPG key (asc)
+    - name: Download Docker GPG key
       ansible.builtin.get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: "{{ docker_apt_keyring }}"
         mode: "0644"
 
-    - name: Add Docker apt source (docker.sources)
+    - name: Add Docker apt source
       ansible.builtin.copy:
         dest: "{{ docker_sources_file }}"
         mode: "0644"
@@ -50,7 +55,7 @@
         state: present
         update_cache: true
 
-    - name: Ensure docker service enabled and started
+    - name: Ensure Docker service is enabled and running
       ansible.builtin.systemd:
         name: docker
         enabled: true
@@ -61,36 +66,40 @@
         name: docker
         state: present
 
-    - name: Add azureuser to docker group
+    - name: Add user to docker group
       ansible.builtin.user:
-        name: azureuser
+        name: "{{ docker_user }}"
         groups: docker
         append: true
 
-    - name: Reset SSH connection so new group membership is applied
+    - name: Reset SSH connection to apply group membership
       ansible.builtin.meta: reset_connection
 
+
+########################################
+# PLAY 2 – Run 2048 Docker container
+########################################
+- name: Run 2048 game container
+  hosts: docker_hosts
+  become: true
+
+  vars:
+    image_name: "agrawpri/2048-docker:latest"
+    container_name: "game-2048"
+    host_port: 8080
+    container_port: 80
+
+  tasks:
+    - name: Pull 2048 Docker image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        source: pull
+
     - name: Run 2048 container
-      hosts: docker_hosts
-      become: true
-
-      vars:
-      image_name: "agrawpri/2048-docker:latest"
-      container_name: "game-2048"
-      host_port: 8080
-      container_port: 80
-
-      tasks:
-        - name: Pull image
-          community.docker.docker_image:
-          name: "{{ image_name }}"
-          source: pull
-
-        - name: Run container (restart always)
-          community.docker.docker_container:
-          name: "{{ container_name }}"
-          image: "{{ image_name }}"
-          state: started
-          restart_policy: always
-          ports:
-            - "{{ host_port }}:{{ container_port }}"
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ host_port }}:{{ container_port }}"
