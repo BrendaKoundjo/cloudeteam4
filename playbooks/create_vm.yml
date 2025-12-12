@@ -41,10 +41,10 @@
           priority: 1002
           direction: Inbound
         - name: springboot
-          protocol: https
+          protocol: Tcp
           destination_port_range: 8080
           access: Allow
-          priority: 1001
+          priority: 1011
           direction: Inbound  
         
   - name: Create a network interface using existing security group and public IP
@@ -72,3 +72,4 @@
         publisher: Canonical
         sku: server
         version: latest
+        
