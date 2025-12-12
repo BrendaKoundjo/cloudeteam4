@@ -43,7 +43,7 @@
   - name: Create a network interface using existing security group and public IP
     azure_rm_networkinterface:
       name: nic003
-      resource_group: myResourceGroup
+      resource_group: team4rg
       virtual_network: vnet001
       subnet_name: subnet001
       security_group: secgroup001
