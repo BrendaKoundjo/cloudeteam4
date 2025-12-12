@@ -40,6 +40,13 @@
           access: Allow
           priority: 1001
           direction: Inbound
+        - name: springboot
+          protocol: https
+          destination_port_range: 8080
+          access: Allow
+          priority: 1001
+          direction: Inbound  
+        
   - name: Create a network interface using existing security group and public IP
     azure_rm_networkinterface:
       name: myNIC
