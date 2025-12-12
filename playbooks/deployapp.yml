@@ -1,4 +1,3 @@
----
 - name: Install Docker Engine (official repo) and configure permissions
   hosts: docker_hosts
   become: true
