@@ -3,7 +3,7 @@
 # PLAY 1 – Install Docker & configure user
 ########################################
 - name: Install Docker Engine (official repo) and configure permissions
-  hosts: docker_hosts
+  hosts: all
   become: true
 
   vars:
